@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    padding: 0;
+    margin: 0;
+}
+
+#root{
+    padding: 0;
+    margin: 0;
+}
+
+.input-no-focus:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}

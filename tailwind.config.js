@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 export default {
   content: [
     "./index.html",
@@ -6,7 +7,13 @@ export default {
     'node_modules/flowbite-react/lib/esm/**/*.js'
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        charcoal: '#333333',
+        gunmetal: '#2a2a2a',
+        lightGray: '#e0e0e0'
+      },
+    },
   },
   plugins: [
     require('flowbite/plugin')

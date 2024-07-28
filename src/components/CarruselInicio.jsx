@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../Api';
 
 const MainCarousel = () => {
-    const [movies, setMovies] = useState([]);
-    const [displayMovies, setDisplayMovies] = useState([]);
+    const [movie, setMovies] = useState(null);
 
     useEffect(() => {
         const fetchMovies = async () => {
@@ -11,10 +10,13 @@ const MainCarousel = () => {
                 const response = await api.get('https://api.themoviedb.org/3/movie/popular');
                 const allMovies = response.data.results;
                 
-                // Seleccionar 4 películas aleatorias
-                const randomMovies = getRandomMovies(allMovies, 4);
-                setMovies(allMovies);
-                setDisplayMovies(randomMovies);
+                //Seleccionar una pelicula aleatoria
+                const randomMovies = getRandomMovies(allMovies);
+
+                // Obtener detalles de la película, incluyendo el tráiler
+                const movieDetails = await api.get(`https://api.themoviedb.org/3/movie/${randomMovies.id}?append_to_response=videos`);
+                const movieWithDetails = movieDetails.data;
+                setMovies(movieWithDetails);
             } catch (error) {
                 console.error('Error fetching popular movies:', error);
             }
@@ -23,33 +25,35 @@ const MainCarousel = () => {
         fetchMovies();
     }, []);
 
-    // Función para seleccionar un número específico de películas aleatorias
-    const getRandomMovies = (moviesArray, num) => {
-        const shuffled = [...moviesArray].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, num);
+    // Función para seleccionar una película aleatoria
+    const getRandomMovies = (moviesArray) => {
+        const randomIndex = Math.floor(Math.random() * moviesArray.length);
+        return moviesArray[randomIndex];
     };
 
+    if (!movie) return <div className="text-white">Loading...</div>;
+
+    const trailer = movie.videos?.results?.find(video => video.type === 'Trailer' && video.site === 'YouTube');
+    const trailerUrl = trailer ? `https://www.youtube.com/embed/${trailer.key}?vq=hd1080&showinfo=0&modestbranding=1&rel=0` : '';
+
     return (
-        <div className="w-full p-4 flex flex-col items-center justify-center">
-            <h1 className="text-2xl font-bold mb-4 text-lightGray">Novedades en películas</h1>
-            <div className="grid grid-cols-4 gap-4 w-full">
-                {displayMovies.map((movie, index) => (
-                    <div key={index} className="relative group">
-                        <img
-                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                            alt={`Slide ${index + 1}`}
-                            className="w-full h-auto object-cover rounded-lg shadow-lg transition-transform transform group-hover:scale-105"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <h2 className="text-lg font-bold">{movie.title}</h2>
-                            <p className="text-sm">{movie.overview.substring(0, 200)}...</p>
-                            <p className="text-xs">Fecha de lanzamiento: {movie.release_date}</p>
-                            <p className="text-xs">Calificación: {movie.vote_average} ({movie.vote_count} votos)</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+        <div className="w-full flex flex-col items-center justify-center">
+        <div className="relative group w-full flex items-center justify-center p-2">
+            {trailerUrl ? (
+                <iframe
+                    className="w-11/12 h-screen rounded-lg shadow-lg"
+                    src={trailerUrl}
+                    frameBorder="0"
+                    allowFullScreen
+                    title="Movie Trailer"
+                />
+            ) : (
+                <div className="w-full h-screen flex items-center justify-center bg-black text-white">
+                    Tráiler no disponible
+                </div>
+            )}
         </div>
+    </div>
     );
 };
 

@@ -3,9 +3,8 @@ import Tarjetas from '../components/TarjetasHome'
 
 function Home() {
     return (
-        <div className='bg-charcoal'>
+        <div className='bg-gray-950'>
             <Carrusel />
-            <Tarjetas />
         </div>
     )
 }

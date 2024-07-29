@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../Api';
 
-const MainCarousel = () => {
+const HeroImage = () => {
     const [movie, setMovies] = useState(null);
 
     useEffect(() => {
@@ -14,7 +14,7 @@ const MainCarousel = () => {
                 const randomMovies = getRandomMovies(allMovies);
 
                 // Obtener detalles de la película, incluyendo el tráiler
-                const movieDetails = await api.get(`https://api.themoviedb.org/3/movie/${randomMovies.id}?append_to_response=videos`);
+                const movieDetails = await api.get(`https://api.themoviedb.org/3/movie/${randomMovies.id}`);
                 const movieWithDetails = movieDetails.data;
                 setMovies(movieWithDetails);
             } catch (error) {
@@ -33,28 +33,25 @@ const MainCarousel = () => {
 
     if (!movie) return <div className="text-white">Loading...</div>;
 
-    const trailer = movie.videos?.results?.find(video => video.type === 'Trailer' && video.site === 'YouTube');
-    const trailerUrl = trailer ? `https://www.youtube.com/embed/${trailer.key}?vq=hd1080&showinfo=0&modestbranding=1&rel=0` : '';
+    const imageUrl = `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
 
     return (
         <div className="w-full flex flex-col items-center justify-center">
-        <div className="relative group w-full flex items-center justify-center p-2">
-            {trailerUrl ? (
-                <iframe
-                    className="w-11/12 h-screen rounded-lg shadow-lg"
-                    src={trailerUrl}
-                    frameBorder="0"
-                    allowFullScreen
-                    title="Movie Trailer"
+            <div className="relative group w-full">
+                <img
+                    src={imageUrl}
+                    alt={movie.title}
+                    className="w-full h-auto"
                 />
-            ) : (
-                <div className="w-full h-screen flex items-center justify-center bg-black text-white">
-                    Tráiler no disponible
+                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <h2 className="text-2xl font-bold">{movie.title}</h2>
+                    <p className="text-sm">{movie.overview}</p>
+                    <p className="text-xs">Fecha de lanzamiento: {movie.release_date}</p>
+                    <p className="text-xs">Calificación: {movie.vote_average} ({movie.vote_count} votos)</p>
                 </div>
-            )}
+            </div>
         </div>
-    </div>
     );
 };
 
-export default MainCarousel;
+export default HeroImage;

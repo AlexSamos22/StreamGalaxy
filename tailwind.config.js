@@ -16,6 +16,9 @@ export default {
         gunmetal: '#2a2a2a',
         lightGray: '#e0e0e0'
       },
+      height: {
+        '30rem': '40rem',
+      },
     },
   },
   darkMode: "class",
